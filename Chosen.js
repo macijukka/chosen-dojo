@@ -40,6 +40,7 @@ define(["dojo/_base/declare",
 			this.result_single_selected = null;
 			this.options = options != null ? options : {};
 			this.results_none_found = domAttr.get(this.form_field, 'data-no_results_text') || this.options.no_results_text || "No results match";
+			this.options.show_disabled = domAttr.get(this.form_field, 'data-show_disabled') == 'true' || this.options.show_disabled || false;
 			this.set_up_html();
 			this.register_observers();
 			domClass.add(this.form_field, 'chzn-done');
@@ -315,7 +316,7 @@ define(["dojo/_base/declare",
 		},
 
 		search_results_mouseup: function(evt) {
-			var target = domClass.contains(query(evt.target).shift(), 'active-result') ? evt.target : query(evt.target).parent('.active-result').shift();
+			var target = domClass.contains(query(evt.target).shift(), 'active-result') && ((this.options.show_disabled && !domClass.contains(query(evt.target).shift(), 'disabled')) || !this.options.show_disabled) ? evt.target : query(evt.target).parent('.active-result').shift();
 
 			if(target) {
 				this.result_highlight = target;
@@ -590,7 +591,10 @@ define(["dojo/_base/declare",
 		},
 
 		result_do_highlight: function(el) {
-			if(el) {
+			var position = el.id.substr(el.id.lastIndexOf("_") + 1);
+		    var item = this.results_data[position];
+
+		    if(el && ((this.options.show_disabled && !item.disabled) || !this.options.show_disabled)) {
 				this.result_clear_highlight();
 				this.result_highlight = el;
 				domClass.add(this.result_highlight, "highlighted");
@@ -844,7 +848,7 @@ define(["dojo/_base/declare",
 		},
 
 		result_add_option: function(option) {
-			if(!option.disabled) {
+			if(this.options.show_disabled || (!this.options.show_disabled && !option.disabled)) {
 				option.dom_id = this.container_id + "_o_" + option.array_index;
 				var classes = option.selected && this.is_multiple ? [] : ["active-result"];
 
@@ -855,6 +859,9 @@ define(["dojo/_base/declare",
 				if(option.group_array_index != null) {
 					classes.push("group-option");
 				}
+				
+				if(option.disabled)
+					classes.push('disabled');
 
 				if(option.classes !== "") {
 					classes.push(option.classes);
@@ -941,7 +948,7 @@ define(["dojo/_base/declare",
 	function select_to_array() {
 		var parser = new SelectParser();
 
-		query('> option', this).forEach(function(child) {
+		query('>', this).forEach(function(child) {
 			parser.add_node(child);
 		});
 
