@@ -76,7 +76,7 @@ define(["dojo/_base/declare",
 
 			var dd_top = domGeom.position(this.container, false).h;
 
-			var dd_width = this.f_width - (domGeom.position(this.dropdown).w - domGeom.getContentBox(this.dropdown).w);
+			var dd_width = this.f_width - (domGeom.position(this.dropdown).w - domGeom.getMarginBox(this.dropdown).w);
 			domStyle.set(this.dropdown, {
 				'width': dd_width + "px",
 				'top': dd_top + "px"
@@ -93,7 +93,7 @@ define(["dojo/_base/declare",
 				this.search_container = query('div.chzn-search', this.container).shift();
 				this.selected_item = query('.chzn-single', this.container).shift();
 
-				var sf_width = dd_width - (domGeom.position(this.search_container).w - domGeom.getContentBox(this.search_container).w) - (domGeom.position(this.search_field).w -  domGeom.getContentBox(this.search_field).w);
+				var sf_width = dd_width - (domGeom.position(this.search_container).w - domGeom.getContentBox(this.search_container).w) - (domGeom.position(this.search_field).w -  domGeom.getMarginBox(this.search_field).w);
 				domStyle.set(this.search_field, 'width', sf_width + 'px');
 			}
 
